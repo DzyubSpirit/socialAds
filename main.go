@@ -63,10 +63,16 @@ func main() {
 	}
 	usersRef := fb.Child("users")
 	usersRef.ChildAdded(func(snapshot firego.DataSnapshot, previousChildKey string) {
+		var user map[string]interface{}
+		var ok bool
+		if user, ok = snapshot.Value.(map[string]interface{}); !ok {
+			log.Printf("error converting snapshot value to map")
+			return
+		}
+
 		addr := cli.CreateWallet()
-		update := make(map[string]interface{}, 1)
-		update[snapshot.Key] = addr
-		err := usersRef.Update(update)
+		user[snapshot.Key] = addr
+		err := usersRef.Update(user)
 		if err != nil {
 			log.Printf("error updating user with wallet address %q: %v", addr, err)
 		}
