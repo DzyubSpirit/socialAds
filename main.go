@@ -10,8 +10,10 @@ import (
 	"time"
 	"github.com/boltdb/bolt"
 	"fmt"
-	"git.nodeart.io/validitychaingo/firebase"
 	"github.com/DzyubSpirit/firego"
+	"io/ioutil"
+	"golang.org/x/oauth2/google"
+	"context"
 )
 
 const (
@@ -21,6 +23,23 @@ const (
 	credsBytes     = "social-ads-1708a-firebase-adminsdk-qtbhe-1c11808167.json"
 	databaseURL    = "https://social-ads-1708a.firebaseio.com/"
 )
+
+// NewFirebaseWithCreds loads credentials for firebase and connects to firebase
+func NewFirebaseWithCreds(credsFilename string, databaseURL string) (*firego.Firebase, error) {
+	d, err := ioutil.ReadFile(credsFilename)
+	if err != nil {
+		return nil, err
+	}
+
+	conf, err := google.JWTConfigFromJSON(d, "https://www.googleapis.com/auth/userinfo.email",
+		"https://www.googleapis.com/auth/firebase.database")
+	if err != nil {
+		return nil, err
+	}
+
+	f := firego.New(databaseURL, conf.Client(context.Background()))
+	return f, nil
+}
 
 func main() {
 	sAddr := flag.String("main_address", "", "a wallet of the service")
@@ -38,7 +57,7 @@ func main() {
 	log.Printf("main addr: %q", *sAddr)
 	cli.CreateBlockchain(*sAddr)
 
-	fb, err := firebase.NewFirebaseWithCreds(credsBytes, databaseURL)
+	fb, err := NewFirebaseWithCreds(credsBytes, databaseURL)
 	if err != nil {
 		log.Fatalf("error creating firebase connection: %v", err)
 	}
