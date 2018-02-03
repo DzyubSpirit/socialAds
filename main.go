@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Jeiwan/blockchain_go"
+	"github.com/dzyubspirit/blockchain_go"
 	"net/http"
 	"log"
 	"flag"
@@ -32,7 +32,7 @@ func main() {
 			return
 		}
 
-		cli.Send(*sAddr, addr, int(friendsCount*multiplier))
+		cli.Send(*sAddr, addr, int(float64(friendsCount)*multiplier))
 		res.Write([]byte("Okey"))
 	})
 
