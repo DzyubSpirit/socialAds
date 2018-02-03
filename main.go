@@ -71,7 +71,7 @@ func main() {
 		}
 
 		addr := cli.CreateWallet()
-		user[snapshot.Key] = addr
+		user["address"] = addr
 		err := usersRef.Update(user)
 		if err != nil {
 			log.Printf("error updating user with wallet address %q: %v", addr, err)
