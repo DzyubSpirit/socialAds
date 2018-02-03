@@ -74,7 +74,7 @@ func main() {
 		update := make(map[string]map[string]interface{}, 1)
 		user["address"] = addr
 		update[snapshot.Key] = user
-		err := usersRef.Update(user)
+		err := usersRef.Update(update)
 		if err != nil {
 			log.Printf("error updating user with wallet address %q: %v", addr, err)
 		}
