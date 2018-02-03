@@ -10,12 +10,16 @@ import (
 	"time"
 	"github.com/boltdb/bolt"
 	"fmt"
+	"git.nodeart.io/validitychaingo/firebase"
+	"github.com/DzyubSpirit/firego"
 )
 
 const (
 	dbFile         = "userInfo.dat"
 	lastPostBucket = "lastPost"
 	postCooldown   = 8 * time.Hour
+	credsBytes     = "social-ads-1708a-firebase-adminsdk-qtbhe-1c11808167.json"
+	databaseURL    = "https://social-ads-1708a.firebaseio.com/"
 )
 
 func main() {
@@ -33,6 +37,21 @@ func main() {
 	}
 	log.Printf("main addr: %q", *sAddr)
 	cli.CreateBlockchain(*sAddr)
+
+	fb, err := firebase.NewFirebaseWithCreds(credsBytes, databaseURL)
+	if err != nil {
+		log.Fatalf("error creating firebase connection: %v", err)
+	}
+	usersRef := fb.Child("users")
+	usersRef.ChildAdded(func(snapshot firego.DataSnapshot, previousChildKey string) {
+		addr := cli.CreateWallet()
+		update := make(map[string]interface{}, 1)
+		update[snapshot.Key] = addr
+		err := usersRef.Update(update)
+		if err != nil {
+			log.Printf("error updating user with wallet address %q: %v", addr, err)
+		}
+	})
 
 	http.HandleFunc("/reward", func(res http.ResponseWriter, req *http.Request) {
 		p := req.URL.Query()
