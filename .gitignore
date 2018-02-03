@@ -70,3 +70,4 @@ fabric.properties
 
 blockchain.db
 wallet.dat
+userInfo.dat
