@@ -54,5 +54,5 @@ func main() {
 			log.Printf("json.Encode(%q): %v", addr, err)
 		}
 	})
-	http.ListenAndServe(":80", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
